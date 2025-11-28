@@ -8,7 +8,7 @@ import java.util.Scanner;//Import relevant data
 public class MenuUI {
     private WeaponStore weaponStore = new WeaponStore();
     private WeaponSearch weaponSearch = new WeaponSearch(weaponStore);
-    private Scanner input = new Scanner(System.in);//初始化相关数据
+    private Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println();
@@ -23,9 +23,16 @@ public class MenuUI {
     }
 
     // Get menu option
-    private int getMenuOption() {//打印菜单（可读）
+    private int getMenuOption() {
         System.out.print("""
-                Weapon Menu                ---------                   1) Add a Weapon                   2) Display All Weapons                   3) Search Weapon                   4) Delete a Weapon                   0) Exit                ==>> """);
+                Weapon Menu
+                ---------
+                1) Add a Weapon
+                2) Display All Weapons
+                3) Search Weapon
+                4) Delete a Weapon
+                0) Exit
+                ==>> """);
         int option = input.nextInt();
         return option;
     }
@@ -76,7 +83,7 @@ public class MenuUI {
 
     // Delete weapon
     private void deleteWeapon() {
-        input.nextLine();//清除残留
+        input.nextLine();//clean the rest
         System.out.print("Enter Weapon ID to delete: ");
         String id = input.nextLine();
         weaponStore.deleteWeapon(id);//Call the deletion method
