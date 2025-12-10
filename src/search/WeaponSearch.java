@@ -1,65 +1,82 @@
 package search;
 import store.WeaponStore;
 import model.Weapon;
-import java.util.List;
 
 public class WeaponSearch {
-    //Holds an instance of WeaponStore to access the weapon list
+    //Dependent on WeaponStore to get weapon data (array + current count)
     private WeaponStore weaponStore;
 
-    //Constructor:Intializes the WeaponSearch with a WeaponStore instance
     public WeaponSearch(WeaponStore weaponStore) {
         this.weaponStore = weaponStore;
     }
-    //Searches for a Weapon by its ID and returns the matching Weapon
 
-    public Weapon searchById(String id) {
+    public Weapon[] searchByIdPartial(String partialld) {
         //Get the list of all weapons from WeaponStore
-        List<Weapon> weaponList = weaponStore.getWeaponList();
-        //Variable to store the found Weapon (null by default)
-        Weapon result = null;
-        //Iterate through the weapon list to find the matching ID
-        for (int i = 0; i < weaponList.size(); i++) {
-            Weapon currentWeapon = weaponList.get(i);
-            // Check if the current weapon's ID matches the input ID
-            if (currentWeapon.getId().equals(id) == true) {
-                result = currentWeapon;
-                // Assign the matching weapon to result
+        Weapon[] allWeapons = weaponStore.getWeaponArray();
+        int count = weaponStore.getCurrentCount();
+        //Temporary array to store matched weapons
+        Weapon[] tempResult = new Weapon[count];
+        int resultIndex = 0;
+
+        //Traverse all valid weapons
+        for (int i = 0; i < count; i++) {
+            if (allWeapons[i].getld().contains(partialld)) {
+                tempResult[resultIndex] = allWeapons[i];
+                resultIndex++;
             }
         }
-        // Return the found weapon, or print a message and return null if not found
-        if (result != null) {
-            return result;
-        } else {
-            System.out.println("Weapon not found with ID: " + id);
-            return null;
+
+        Weapon[] finalResult = new Weapon[resultIndex];
+        for (int i = 0; i < resultIndex; i++) {
+            finalResult[i] = tempResult[i];
         }
+        return finalResult;
     }
-    //Filters weapons by type and prints all matching weapons
-    public void filterByType(String type) {
-        //Get the list of all weapons from WeaponStore
-        List<Weapon> weaponList = weaponStore.getWeaponList();
-        //Flag to check if any weapons of the input type are found
-        boolean hasResult = false;
-        // Print header for the filtered weapon type
-        System.out.println("----------------------------");
-        System.out.println("  " + type + " Type Weapons       ");
-        System.out.println("----------------------------");
-        // Iterate through the weapon list to find weapons of the input type
-        for (int i = 0; i < weaponList.size(); i++) {
-            Weapon currentWeapon = weaponList.get(i);
-            //Check if the current weapon's type matches the input type
-            if (currentWeapon.getType().equals(type) == true) {
-                System.out.println(currentWeapon);
-                // Print the matching weapon
-                hasResult = true;
-                // Set flag to true (weapons found)
+
+    public Weapon[] filterByType(String type) {
+        Weapon[] allWeapons = weaponStore.getWeaponArray();
+        int count = weaponStore.getCurrentCount();
+        Weapon[] tempResult = new Weapon[count];
+        int resultIndex = 0;
+
+        for (int i = 0; i < count; i++) {
+            if (allWeapons[i].getType().equals(type)) {
+                tempResult[resultIndex] = allWeapons[i];
+                resultIndex++;
             }
         }
-        // Print a message if no weapons of the input type are found
-        if (hasResult == false) {
-            System.out.println("No " + type + " type weapons found...");
+
+        Weapon[] finalResult = new Weapon[resultIndex];
+        for (int i = 0; i < resultIndex; i++) {
+            finalResult[i] = tempResult[i];
         }
+        return finalResult;
+    }
+
+    //V1.1 New Feature: Sort weapons by power (bubble sort)
+    public Weapon[]
+    sortByPower(boolean isAscending) {
+        Weapon[] allWeapons = weaponStore.getWeaponArray();
+        int count = weaponStore.getCurrentCount();
+        Weapon[] sortedWeapons = new Weapon[count];
+        for (int i = 0; i < count; i++) {
+            sortedWeapons[i] = allWeapons[i];
+        }
+
+        for (int i = 0; i < count; i++) {
+            for (int j = 0; j < count - 1 - i; j++) {
+                boolean needSwap = false;
+                if (isAscending) {
+                    needSwap = sortedWeapons[j].getPower() < sortedWeapons[j + 1].getPower();
+                }
+                if (!needSwap) {
+                    Weapon temp = sortedWeapons[j];
+                    sortedWeapons[j] = sortedWeapons[j + 1];
+                    sortedWeapons[j + 1] = temp;
+                }
+            }
+        }
+        return sortedWeapons;
     }
 }
 
