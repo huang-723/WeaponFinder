@@ -2,121 +2,163 @@ package ui;
 import store.WeaponStore;
 import search.WeaponSearch;
 import model.Weapon;
-import java.util.Scanner;//Import relevant data
+import javax.swing.JOptionPane;//Import relevant data
 
 
 public class MenuUI {
     private WeaponStore weaponStore = new WeaponStore();
     private WeaponSearch weaponSearch = new WeaponSearch(weaponStore);
-    private Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.println();
-        System.out.println("----------------------------");
-        System.out.println("  Weapon Finder V1.0        ");
-        System.out.println("----------------------------");
-        System.out.println();
-        MenuUI menu = new MenuUI();//Create a menu
-
-        menu.runMenu();//Start menu
-
+        JOptionPane.showMessageDialog(null,
+                "------------------------\n" +
+                        "  WeaponFinder V1.1     \n" +
+                        "------------------------",
+                "Welcome", JOptionPane.INFORMATION_MESSAGE);
+        MenuUI menu = new MenuUI();
+        menu.runMenu();
     }
 
-    // Get menu option
-    private int getMenuOption() {
-        System.out.print("""
-                Weapon Menu
-                ---------
-                1) Add a Weapon
-                2) Display All Weapons
-                3) Search Weapon
-                4) Delete a Weapon
-                0) Exit
-                ==>> """);
-        int option = input.nextInt();
-        return option;
-    }
-
-    // Run main menu loop
     private void runMenu() {
-        int option = getMenuOption();
-        while (option != 0) {
-            switch (option) {
-                case 1 -> addWeapon();
-                case 2 -> weaponStore.listWeapons();
-                case 3 -> searchWeapon();
-                case 4 -> deleteWeapon();
-                default -> System.out.println("Invalid option entered: " + option);//Remove residues
-
+        while (true) {
+            String menuInput = JOptionPane.showInputDialog(null,
+                    "WeaponFinder Menu:\n" +
+                            "1) Add a Weapon\n" +
+                            "2) Display All Weapons\n" +
+                            "3) Search Weapon\n" +
+                            "4) Delete a Weapon\n" +
+                            "0) Exit\n" +
+                            "Please enter your choice (0-4):",
+                    "Main Menu", JOptionPane.QUESTION_MESSAGE);
+            if (menuInput == null) {
+                JOptionPane.showMessageDialog(null, "Exiting program...", "Exit",
+                        JOptionPane.INFORMATION_MESSAGE);
+                System.exit(0);
             }
-            // Fix Scanner bug
-            System.out.println("\nPress enter key to continue...");
-            input.nextLine();
-            input.nextLine();
-            option = getMenuOption();//Retrieve the menu again
-
+            int choice;
+            try {
+                choice = Integer.parseInt(menuInput);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null,
+                        "Error: Please enter a NUMBER (0-4)!",
+                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+            switch (choice) {
+                case 1:
+                    addWeapon();
+                    break;
+                case 2:
+                    weaponStore.listWeapons();
+                    JOptionPane.showMessageDialog(null, "Weapons listed in console!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case 3:
+                    searchWeapon();
+                    break;
+                case 4:
+                    deleteWeapon();
+                    break;
+                case 0:
+                    JOptionPane.showMessageDialog(null, "Goodbye!", "Exit", JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0);
+                default:
+                    JOptionPane.showMessageDialog(null,
+                            "Error: Invalid option! Please enter 0-4.",
+                            "Invalid Choice", JOptionPane.ERROR_MESSAGE);
+            }
         }
-        System.out.println("Exiting program, goodbye!");//Exit prompt
-
     }
 
-    // Add weapon
+    //Add weapon
     private void addWeapon() {
-        input.nextLine();
-        System.out.print("Enter Weapon ID (e.g., SEA-001): ");
-        String id = input.nextLine();
-        System.out.print("Enter Weapon Type (Sea/Land/Air): ");
-        String type = input.nextLine();
-        System.out.print("Enter Weapon Name: ");
-        String name = input.nextLine();
-        System.out.print("Enter Weapon Power (1-100): ");
-        int power = input.nextInt();
-        input.nextLine();
-        System.out.print("Enter Weapon Usage: ");
-        String usage = input.nextLine();//Weapon-related attributes
+        String id = JOptionPane.showInputDialog(null, "Enter Weapon ID (e.g., SEA-001):", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (id == null) return;
 
+        String type = JOptionPane.showInputDialog(null, "Enter Weapon Type (Sea/Land/Air):", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (type == null) return;
 
-        Weapon weapon = new Weapon(id, type, name, power, usage);//Create and save
+        String name = JOptionPane.showInputDialog(null, "Enter Weapon Name:", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (name == null) return;
 
+        int power = 0;
+        while (true) {
+            String powerInput = JOptionPane.showInputDialog(null, "Enter Weapon Power (1-100):", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
+            if (powerInput == null) return;
+            try {
+                power = Integer.parseInt(powerInput);
+                if (power >= 1 && power <= 100) break;
+                else
+                    JOptionPane.showMessageDialog(null, "Power must be 1-100!", "Invalid Power", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Please enter a NUMBER!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        String usage = JOptionPane.showInputDialog(null, "Enter Weapon Usage:", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (usage == null) return;
+
+        Weapon weapon = new Weapon(id, type, name, power, usage);
         weaponStore.addWeapon(weapon);
     }
 
+
     // Delete weapon
     private void deleteWeapon() {
-        input.nextLine();//clean the rest
-        System.out.print("Enter Weapon ID to delete: ");
-        String id = input.nextLine();
-        weaponStore.deleteWeapon(id);//Call the deletion method
-
+        String id = JOptionPane.showInputDialog(null, "Enter Weapon ID to delete:", "Delete Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (id == null) return;
+        weaponStore.deleteWeapon(id);
     }
+
 
     // Search weapon
     private void searchWeapon() {
-        input.nextLine();
-        System.out.print("Search by 1) ID 2) Type: ");
-        int choice = input.nextInt();//Search method
+        String searchChoice = JOptionPane.showInputDialog(null,
+                "Search by:\n1) ID (Partial Match)\n2) Type\n3) Sort by Power (Asc/Desc)\nPlease enter 1/2/3:",
+                "Search Weapon", JOptionPane.QUESTION_MESSAGE);
+        if (searchChoice == null) return;
 
-        input.nextLine();
-
-        if (choice == 1) {//Search precisely by ID
-
-            System.out.print("Enter Weapon ID: ");
-            String id = input.nextLine();
-            Weapon result = weaponSearch.searchById(id);
-            if (result != null) {
-                System.out.println("----------------------------");
-                System.out.println("  Search Result             ");
-                System.out.println("----------------------------");
-                System.out.println(result);
-            }
-        } else if (choice == 2) {//Fuzzy matching
-
-            System.out.print("Enter Weapon Type (Sea/Land/Air): ");
-            String type = input.nextLine();
-            weaponSearch.filterByType(type);
-        } else {
-            System.out.println("Invalid search option!");//Invalid search method prompt
-
+        int choice;
+        try {
+            choice = Integer.parseInt(searchChoice);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Please enter 1/2/3!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        switch (choice) {
+            case 1:
+                String id = JOptionPane.showInputDialog(null, "Enter Weapon ID (partial match, e.g., SEA):", "Search by ID", JOptionPane.QUESTION_MESSAGE);
+                if (id == null) return;
+                Weapon[] idResult = weaponSearch.searchByIdPartial(id);
+                showSearchResult(idResult);
+                break;
+            case 2:
+                String type = JOptionPane.showInputDialog(null, "Enter Weapon Type (Sea/Land/Air):", "Search by Type", JOptionPane.QUESTION_MESSAGE);
+                if (type == null) return;
+                Weapon[] typeResult = weaponSearch.filterByType(type);
+                showSearchResult(typeResult);
+                break;
+            case 3:
+                String sortChoice = JOptionPane.showInputDialog(null, "Sort by Power:\n1) Ascending\n2) Descending\nEnter 1/2:", "Sort Weapons", JOptionPane.QUESTION_MESSAGE);
+                if (sortChoice == null) return;
+                int sort = Integer.parseInt(sortChoice);
+                Weapon[] sortedWeapons = weaponSearch.sortByPower(sort == 1);
+                showSearchResult(sortedWeapons);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, "Invalid choice!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showSearchResult(Weapon[] result) {
+        if (result == null || result.length == 0) {
+            JOptionPane.showMessageDialog(null, "No weapons found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        System.out.println("------------------------ Search Result ------------------------");
+        for (Weapon weapon : result) {
+            if (weapon != null) System.out.println(weapon);
+        }
+        JOptionPane.showMessageDialog(null, "Search result listed in console!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
     }
 }
