@@ -20,7 +20,7 @@ public class WeaponSearch {
 
         //Traverse all valid weapons
         for (int i = 0; i < count; i++) {
-            if (allWeapons[i].getld().contains(partialld)) {
+            if (allWeapons[i].getId().contains(partialld)) {
                 tempResult[resultIndex] = allWeapons[i];
                 resultIndex++;
             }
