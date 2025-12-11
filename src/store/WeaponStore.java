@@ -21,7 +21,7 @@ public class WeaponStore {
 
         for(int i=0;i<currentCount;i++){
             if (weaponArray[i].getId().equals(weapon.getId())){
-                System.out.println("Error:WeaponId"+weapon.getId()+"alreadly exists");
+                System.out.println("Error:WeaponId"+weapon.getId()+"already exists");
                 return false;
               }
             }
@@ -67,7 +67,7 @@ public class WeaponStore {
             System.out.println("Success:Weapon" + id + "deleted");
         }  //If the target weapon is found,execute deletion logic
            else {
-            System.out.println("Error:Weapon Id" + id + "notfound");
+            System.out.println("Error:Weapon Id" + id + "not found");
         } //Target weapon not found,prompt error
     }
 

@@ -10,7 +10,7 @@ public class WeaponSearch {
         this.weaponStore = weaponStore;
     }
 
-    public Weapon[] searchByIdPartial(String partialld) {
+    public Weapon[] searchByIdPartial(String partialId) {
         //Get the list of all weapons from WeaponStore
         Weapon[] allWeapons = weaponStore.getWeaponArray();
         int count = weaponStore.getCurrentCount();
@@ -20,7 +20,7 @@ public class WeaponSearch {
 
         //Traverse all valid weapons
         for (int i = 0; i < count; i++) {
-            if (allWeapons[i].getId().contains(partialld)) {
+            if (allWeapons[i].getId().contains(partialId)) {
                 tempResult[resultIndex] = allWeapons[i];
                 resultIndex++;
             }
@@ -59,7 +59,7 @@ public class WeaponSearch {
         Weapon[] allWeapons = weaponStore.getWeaponArray();
         int count = weaponStore.getCurrentCount();
         Weapon[] sortedWeapons = new Weapon[count];
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count - 1; i++) {
             sortedWeapons[i] = allWeapons[i];
         }
 
@@ -67,9 +67,9 @@ public class WeaponSearch {
             for (int j = 0; j < count - 1 - i; j++) {
                 boolean needSwap = false;
                 if (isAscending) {
-                    needSwap = sortedWeapons[j].getPower() < sortedWeapons[j + 1].getPower();
+                    needSwap = sortedWeapons[j].getPower() > sortedWeapons[j + 1].getPower();
                 }
-                if (!needSwap) {
+                if (needSwap) {
                     Weapon temp = sortedWeapons[j];
                     sortedWeapons[j] = sortedWeapons[j + 1];
                     sortedWeapons[j + 1] = temp;
