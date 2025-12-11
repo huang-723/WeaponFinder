@@ -46,7 +46,7 @@ public class Weapon {
 
     //Set weapon name with validation: not empty.
     public void setName(String name){
-        if(!name.isEmpty()){
+        if(name.isEmpty()){
             System.out.println("Error: Weapon name cannot be empty!");
             return;
         }
