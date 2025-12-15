@@ -4,7 +4,7 @@ import search.WeaponSearch;
 import model.Weapon;
 import javax.swing.JOptionPane;//Import relevant data
 
-
+//Uses JOptionPane popups + calls persistence methods
 public class MenuUI {
     private WeaponStore weaponStore = new WeaponStore();
     private WeaponSearch weaponSearch = new WeaponSearch(weaponStore);
@@ -12,13 +12,14 @@ public class MenuUI {
     public static void main(String[] args) {
         JOptionPane.showMessageDialog(null,
                 "------------------------\n" +
-                        "  WeaponFinder V1.1     \n" +
+                        "  WeaponFinder V2.0     \n" +
                         "------------------------",
                 "Welcome", JOptionPane.INFORMATION_MESSAGE);
         MenuUI menu = new MenuUI();
+        menu.weaponStore.loadFromFile(); // V2.0: Load data on startup
         menu.runMenu();
     }
-
+    // Main menu loop: Handles user choices until exit
     private void runMenu() {
         while (true) {
             String menuInput = JOptionPane.showInputDialog(null,
@@ -31,6 +32,7 @@ public class MenuUI {
                             "Please enter your choice (0-4):",
                     "Main Menu", JOptionPane.QUESTION_MESSAGE);
             if (menuInput == null) {
+                weaponStore.saveToFile(); // V2.0: Save on popup close
                 JOptionPane.showMessageDialog(null, "Exiting program...", "Exit",
                         JOptionPane.INFORMATION_MESSAGE);
                 System.exit(0);
@@ -59,6 +61,7 @@ public class MenuUI {
                     deleteWeapon();
                     break;
                 case 0:
+                    weaponStore.saveToFile(); // V2.0: Save on popup close
                     JOptionPane.showMessageDialog(null, "Goodbye!", "Exit", JOptionPane.INFORMATION_MESSAGE);
                     System.exit(0);
                 default:
@@ -69,7 +72,7 @@ public class MenuUI {
         }
     }
 
-    //Add weapon
+    // Collects weapon data via popups + validates numeric input
     private void addWeapon() {
         String id = JOptionPane.showInputDialog(null, "Enter Weapon ID (e.g., SEA-001):", "Add Weapon", JOptionPane.QUESTION_MESSAGE);
         if (id == null) return;
@@ -109,7 +112,7 @@ public class MenuUI {
     }
 
 
-    // Search weapon
+    // Routes search requests to WeaponSearch
     private void searchWeapon() {
         String searchChoice = JOptionPane.showInputDialog(null,
                 "Search by:\n1) ID (Partial Match)\n2) Type\n3) Sort by Power (Asc/Desc)\nPlease enter 1/2/3:",
@@ -148,7 +151,7 @@ public class MenuUI {
                 JOptionPane.showMessageDialog(null, "Invalid choice!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    // Displays search results in console + popup notification
     private void showSearchResult(Weapon[] result) {
         if (result == null || result.length == 0) {
             JOptionPane.showMessageDialog(null, "No weapons found!", "Search Result", JOptionPane.INFORMATION_MESSAGE);
