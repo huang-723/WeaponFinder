@@ -22,7 +22,7 @@ public class Weapon {
         setUsage(usage);
     }
 
-    //Set weapon ID with validation
+    //Validates ID is non-empty and at least 3 characters
     public void setId(String id){
         if (id.isEmpty()){
             System.out.println("Error: Weapon ID cannot be empty!");
@@ -35,7 +35,7 @@ public class Weapon {
         this.id = id;
     }
 
-    //Set weapon type with validation
+    //Restricts type to only Sea/Land/Air
     public void setType(String type){
         if(!type.equals("Sea")&&!type.equals("Air")&&!type.equals("Land")){
             System.out.println("Error: Weapon type must be Sea/Land/Air!");
@@ -46,7 +46,7 @@ public class Weapon {
 
     //Set weapon name with validation: not empty.
     public void setName(String name){
-        if(!name.isEmpty()){
+        if(name.isEmpty()){
             System.out.println("Error: Weapon name cannot be empty!");
             return;
         }
