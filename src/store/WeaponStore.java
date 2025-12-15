@@ -1,90 +1,161 @@
 package store;
 import model.Weapon;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
+//A private member variable that uses Arraylist to
+//implement the list interface for storing weapon inventory data
 public class WeaponStore {
-    private List<Weapon> weaponList = new ArrayList<>();
-    //A private member variable that uses Arraylist to
-    //implement the list interface for storing weapon inventory data
+    private static final int MAX_SIZE=100;
+    private Weapon[]weaponArray=new Weapon[MAX_SIZE];
+    private int currentCount=0;
+
+
+//Validates weapon attributes + checks for duplicate ID
+    private boolean isWeaponValid(Weapon weapon){
+        if(weapon.getId().isEmpty()||weapon.getType().isEmpty()||weapon.getName().isEmpty()){
+            return false;
+        }
+
+        if (weapon.getPower()<1||weapon.getPower()>100){
+            return false;
+        }
+
+        for(int i=0;i<currentCount;i++){
+            if (weaponArray[i].getId().equals(weapon.getId())){
+                System.out.println("Error:WeaponId"+weapon.getId()+"already exists");
+                return false;
+              }
+            }
+        return true;
+        }
+
 
     public void addWeapon(Weapon weapon) {
-        boolean isValid = true;
 
-        if (weapon.getId().isEmpty() == true) {
-            System.out.println("Unable to add Weapon: ID is empty...");
-            isValid = false;
-        }
+        //Check if storage has reached maximum capacity
+       if (currentCount >= MAX_SIZE){
+           System.out.println("Error:Weapon store is full(max 100 weapons)");
+           return;
+       }
 
-        if (weapon.getId().length() < 3 == true) {
-            System.out.println("Unable to add Weapon: ID is too short...");
-            isValid = false;
-        }
+       //Verify weapon attribute validity;if invalid,prompt error and return
+       if (!isWeaponValid(weapon)){
+           System.out.println("Failed to add weapon:invalid attributes!");
+           return;
+       }
 
-        if (weapon.getType().equals("Sea") == false) {
-            if (weapon.getType().equals("Land") == false) {
-                if (weapon.getType().equals("Air") == false) {
-                    System.out.println("Unable to add Weapon: Type must be Sea/Land/Air...");
-                    isValid = false;
-                }
-            }
-        }  //Determine whether the weapon type is valid
+        //Store the weapon in the array and increment the actual count by 1
+       weaponArray[currentCount]=weapon;
+       currentCount++;
+       System.out.println("Success:Weapon added!Total weapons:"+currentCount);
+    }
 
-        if (weapon.getPower() < 1 == true) {
-            System.out.println("Unable to add Weapon: Power is too low...");
-            isValid = false;
-        }
-
-        if (weapon.getPower() > 100 == true) {
-            System.out.println("Unable to add Weapon: Power is too high...");
-            isValid = false;
-        }
-
-        if (weapon.getName().isEmpty() == true) {
-            System.out.println("Unable to add Weapon: Name is empty...");
-            isValid = false;
-        }
-
-        if (isValid == true) {
-            weaponList.add(weapon);
-            System.out.println("Weapon added successfully!");
-        }
-    }  //verify the validity of the weapon
-       //if valid,add it to the inventory
-       //if invalid,prompt the error messages
 
     public void deleteWeapon(String id) {
         boolean isDeleted = false;
-        for (int i = 0; i < weaponList.size(); i++) {
-            Weapon currentWeapon = weaponList.get(i);
-            if (currentWeapon.getId().equals(id) == true) {
-                weaponList.remove(i);
+        int deleteIndex = -1;
+
+        for (int i = 0; i < currentCount; i++) {
+            if (weaponArray[i].getId().equals(id)) {
+                deleteIndex = i;
                 isDeleted = true;
                 break;
             }
         }
-        if (isDeleted == true) {
-            System.out.println("Weapon deleted successfully!");
-        } else {
-            System.out.println("Unable to delete Weapon: ID not found...");
-        }
-    } //delete the corresponding weapon from the inventory based on the weapon ID
 
+        //If the target weapon is found,execute deletion logic
+        if (isDeleted) {
+            for (int i = deleteIndex; i < currentCount - 1; i++) {
+                weaponArray[i] = weaponArray[i + 1];
+            }
+            weaponArray[currentCount - 1] = null;
+            currentCount--;
+            System.out.println("Success:Weapon" + id + "deleted");
+        }
+
+        //Target weapon not found,prompt error
+        else {
+            System.out.println("Error:Weapon Id" + id + "not found");
+        }
+    }
+
+
+    //Display information of all weapons in the store
     public void listWeapons() {
-        if (weaponList.isEmpty() == true) {
-            System.out.println("No weapons in store...");
+        if (currentCount==0){
+            System.out.println("No weapons in storage");
+            return;
+      }
+        System.out.println("------------------------ All Weapons ------------------------");
+        for (int i=0;i<currentCount;i++){
+            System.out.println("Weapon"+(i+1)+":");
+            System.out.println(weaponArray[i]);
+        }
+    }
+
+
+    //Saves weapons to TXT
+    //Uses try-with-resources to auto-close IO streams
+    public void saveToFile() {
+      try (BufferedWriter bw = new BufferedWriter(new FileWriter("weapons.txt"))) {
+          for (int i=0;i<currentCount;i++){
+              Weapon w = weaponArray[i];
+              bw.write(w.getId()+","+w.getType()+","+w.getName()+","+w.getPower()+","+w.getUsage());
+              bw.newLine();
+          }
+          System.out.println("Weapons saved to weapons.txt");
+      }
+
+      catch (IOException e){
+          System.out.println("Save failed: "+e.getMessage());
+      }
+    }
+
+
+    //Loads weapons from TXT
+    public void loadFromFile() {
+        File file = new File("weapons.txt");
+        if (!file.exists()){
+            System.out.println("No save file found.start with empty storage");
             return;
         }
-        System.out.println("----------------------------");
-        System.out.println("  Weapon Data               ");
-        System.out.println("----------------------------");
-        for (int i = 0; i < weaponList.size(); i++) {
-            Weapon currentWeapon = weaponList.get(i);
-            System.out.println(currentWeapon);
-        }
-    } //display all weapon information in a formatted manner
 
-    public List<Weapon> getWeaponList() {
-        return weaponList;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))){
+            String line;
+            while ((line = br.readLine())!=null){
+                String[] parts = line.split(",");
+                if(parts.length!=5) continue;
+                Weapon w = new Weapon(parts[0],parts[1],parts[2],Integer.parseInt(parts[3]),parts[4]);
+                   addWeapon(w);
+            }
+            System.out.println("Weapons loaded from weapons.txt");
+        }
+
+        catch (IOException e){
+            System.out.println("Load failed: "+e.getMessage());
+        }
     }
+
+
+    public Weapon[] getWeaponArray(){
+        return weaponArray;
+    }
+
+    public int getCurrentCount(){
+        return currentCount;
+    }
+
+
+
+
+
+
+
+
+
 }

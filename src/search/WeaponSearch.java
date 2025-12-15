@@ -1,25 +1,26 @@
 package search;
 import store.WeaponStore;
 import model.Weapon;
-//Works with WeaponStore's array storage
 
 public class WeaponSearch {
+    //Dependent on WeaponStore to get weapon data (array + current count)
     private WeaponStore weaponStore;
 
     public WeaponSearch(WeaponStore weaponStore) {
         this.weaponStore = weaponStore;
     }
 
-    //Partial ID match search
-    //Returns array with no null elements(clean result)
     public Weapon[] searchByIdPartial(String partialld) {
+        //Get the list of all weapons from WeaponStore
         Weapon[] allWeapons = weaponStore.getWeaponArray();
         int count = weaponStore.getCurrentCount();
+        //Temporary array to store matched weapons
         Weapon[] tempResult = new Weapon[count];
         int resultIndex = 0;
 
+        //Traverse all valid weapons
         for (int i = 0; i < count; i++) {
-            if (allWeapons[i].getId().contains(partialld)) {
+            if (allWeapons[i].getld().contains(partialld)) {
                 tempResult[resultIndex] = allWeapons[i];
                 resultIndex++;
             }
@@ -32,7 +33,6 @@ public class WeaponSearch {
         return finalResult;
     }
 
-    //Exact type match filter (Sea/Land/Air,case-sensitive)
     public Weapon[] filterByType(String type) {
         Weapon[] allWeapons = weaponStore.getWeaponArray();
         int count = weaponStore.getCurrentCount();
@@ -53,7 +53,7 @@ public class WeaponSearch {
         return finalResult;
     }
 
-    //Creates copy of array to avoid modifying original data
+    //V1.1 New Feature: Sort weapons by power (bubble sort)
     public Weapon[]
     sortByPower(boolean isAscending) {
         Weapon[] allWeapons = weaponStore.getWeaponArray();
@@ -63,7 +63,6 @@ public class WeaponSearch {
             sortedWeapons[i] = allWeapons[i];
         }
 
-        //Bubble sort core:Outer loop = sort rounds,inner loop = adjacent compare
         for (int i = 0; i < count; i++) {
             for (int j = 0; j < count - 1 - i; j++) {
                 boolean needSwap = false;
